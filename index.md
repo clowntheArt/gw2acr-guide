@@ -1,8 +1,11 @@
+---
+title: "GW2 ACR Guide"
+toc: true
+---
+
 # gw2acr - how to build an acr
 
 this guide is my accumulation of info from ctrl + f'ing the discord and my understanding of what an acr is
-
----
 
 ## what an acr is (and is not)
 
@@ -13,8 +16,6 @@ an **acr** defines what actions are executed and under which conditions for **on
 * reacts to cooldowns, buffs and character state
 
 an acr is **not a script**. it does not replay a fixed sequence
-
----
 
 ## core building blocks
 
@@ -27,8 +28,6 @@ a single executable step, such as:
 * activating a profession mechanic
 
 actions may define targeting, parameters and continuation behavior
-
----
 
 ### chains
 
@@ -44,8 +43,6 @@ chains are the basic units of rotation logic
 
 keep chains short and purpose-driven. long chains are harder to reason about and easier to break
 
----
-
 ### priority
 
 chains are evaluated from top to bottom
@@ -58,8 +55,6 @@ if two chains can run, the higher one always wins
 
 most rotation problems are priority problems, not condition problems
 
----
-
 ## chain types
 
 gw2acr supports four distinct chain types. they differ in when and how they are evaluated
@@ -70,8 +65,6 @@ gw2acr supports four distinct chain types. they differ in when and how they are 
 * **stunbreak chains**
 
 understanding the differences is critical to building correct logic
-
----
 
 ## creating a new acr
 
@@ -87,8 +80,6 @@ before creating an acr, the character must exactly match the intended setup:
 any mismatch prevents the acr from activating
 if an acr does not load, recreate it from the live character state
 
----
-
 ### 2. capture the skill bar
 
 * open the **acr editor**
@@ -97,11 +88,7 @@ if an acr does not load, recreate it from the live character state
 
 save immediately
 
----
-
 ## structuring an acr
-
-acrs should be layered rather than linear
 
 ### common structure
 
@@ -113,8 +100,6 @@ acrs should be layered rather than linear
 
 not every acr requires all layers, but this structure scales well
 
----
-
 ## opener chains
 
 * execute once per combat
@@ -123,8 +108,6 @@ not every acr requires all layers, but this structure scales well
 
 openers should be short and intentional
 if an opener fires more than once per fight, it is misclassified
-
----
 
 ## main chains
 
@@ -138,8 +121,6 @@ guidelines:
 
 avoid encoding full rotations as a single chain
 prefer multiple small chains with clear intent
-
----
 
 ## side chains
 
@@ -156,8 +137,6 @@ side chains are evaluated continuously and may fire while another chain is alrea
 
 if a skill has a cast time, channel, or animation lock, it does not belong in a side chain
 
----
-
 ### what side chains are for
 
 side chains are used exclusively for:
@@ -168,8 +147,6 @@ side chains are used exclusively for:
 * opportunistic skills that should fire whenever possible
 
 side chains exist to add behavior without affecting sequencing
-
----
 
 ### side chains vs filler chains
 
@@ -183,8 +160,6 @@ side chains bypass it entirely
 
 use filler chains for low-priority rotation skills
 use side chains only for instant, non-blocking actions
-
----
 
 ## filler chains
 
@@ -203,8 +178,6 @@ best practice:
 
 filler chains absorb timing variance and prevent idle time
 
----
-
 ## stunbreak chains
 
 stunbreak chains are evaluated separately from other chains
@@ -214,8 +187,6 @@ stunbreak chains are evaluated separately from other chains
 * they should be kept minimal and defensive
 
 do not place general utility or damage skills in stunbreak chains
-
----
 
 ## conditions
 
@@ -237,8 +208,6 @@ green condition names can be inverted
 inversion is often cleaner than duplicating logic
 prefer one inverted condition over two nearly identical chains
 
----
-
 ## continue triggers and timing
 
 continue triggers determine when the next action may begin
@@ -252,8 +221,6 @@ guidelines:
 use triggers to enforce animation safety instead of fixed delays
 fixed waits tend to break under alacrity or latency
 
----
-
 ## targeting logic
 
 each action can define its own targeting behavior:
@@ -266,8 +233,6 @@ each action can define its own targeting behavior:
 do not assume default targeting is correct for all skills
 mis-targeted skills are a common silent failure
 
----
-
 ## interrupts and instants
 
 * interrupts are handled automatically
@@ -275,8 +240,6 @@ mis-targeted skills are a common silent failure
 * avoid blocking long chains with instants unless intended
 
 instants should be opportunistic, not rotational anchors
-
----
 
 ## testing and debugging
 
@@ -288,8 +251,6 @@ use the **visual debugger** to:
 
 if something does not fire, check priority before adding more conditions
 
----
-
 ## common mistakes
 
 * treating acrs as scripts
@@ -299,8 +260,6 @@ if something does not fire, check priority before adding more conditions
 * skill-bar mismatches
 
 most issues come from over-specifying behavior instead of letting priority work
-
----
 
 ## design principle
 
