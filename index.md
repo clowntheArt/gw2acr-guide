@@ -6,13 +6,13 @@ this guide is my accumulation of info from ctrl + f'ing the discord and my under
 
 ## what an acr is (and is not)
 
-an **acr** defines what actions are executed and under which conditions for **one exact skill bar**.
+an **acr** defines what actions are executed and under which conditions for **one exact skill bar**
 
 * evaluated continuously during combat
 * executes the **highest-priority valid chain**
 * reacts to cooldowns, buffs and character state
 
-an acr is **not a script**. it does not replay a fixed sequence.
+an acr is **not a script**. it does not replay a fixed sequence
 
 ---
 
@@ -26,13 +26,13 @@ a single executable step, such as:
 * weapon swapping
 * activating a profession mechanic
 
-actions may define targeting, parameters and continuation behavior.
+actions may define targeting, parameters and continuation behavior
 
 ---
 
 ### chains
 
-a **chain** is an ordered list of actions.
+a **chain** is an ordered list of actions
 
 rules:
 
@@ -40,36 +40,36 @@ rules:
 * a chain can only start if all its conditions are met
 * once started, the chain runs to completion
 
-chains are the basic units of rotation logic.
+chains are the basic units of rotation logic
 
-keep chains short and purpose-driven. long chains are harder to reason about and easier to break.
+keep chains short and purpose-driven. long chains are harder to reason about and easier to break
 
 ---
 
 ### priority
 
-chains are evaluated from top to bottom.
+chains are evaluated from top to bottom
 
 * the first valid chain is executed
 * priority determines execution order
 
-priority represents value, not sequence.  
-if two chains can run, the higher one always wins.
+priority represents value, not sequence
+if two chains can run, the higher one always wins
 
-most rotation problems are priority problems, not condition problems.
+most rotation problems are priority problems, not condition problems
 
 ---
 
 ## chain types
 
-gw2acr supports four distinct chain types. they differ in when and how they are evaluated.
+gw2acr supports four distinct chain types. they differ in when and how they are evaluated
 
 * **opener chains**
 * **main chains**
 * **side chains**
 * **stunbreak chains**
 
-understanding the differences is critical to building correct logic.
+understanding the differences is critical to building correct logic
 
 ---
 
@@ -84,8 +84,8 @@ before creating an acr, the character must exactly match the intended setup:
 * utility skills
 * transform state (shroud, kits, etc.)
 
-any mismatch prevents the acr from activating.  
-if an acr does not load, recreate it from the live character state.
+any mismatch prevents the acr from activating
+if an acr does not load, recreate it from the live character state
 
 ---
 
@@ -95,13 +95,13 @@ if an acr does not load, recreate it from the live character state.
 * select **new acr from current skill bar**
 * name the acr clearly (e.g. `reaper_gs`, `tempest_fire`)
 
-save immediately.
+save immediately
 
 ---
 
 ## structuring an acr
 
-acrs should be layered rather than linear.
+acrs should be layered rather than linear
 
 ### common structure
 
@@ -111,7 +111,7 @@ acrs should be layered rather than linear.
 4. **filler chains** low-priority sequential actions
 5. **stunbreak chains** control recovery
 
-not every acr requires all layers, but this structure scales well.
+not every acr requires all layers, but this structure scales well
 
 ---
 
@@ -121,14 +121,14 @@ not every acr requires all layers, but this structure scales well.
 * disabled after the main rotation begins
 * used for setup, long cooldowns or state entry
 
-openers should be short and intentional.  
-if an opener fires more than once per fight, it is misclassified.
+openers should be short and intentional
+if an opener fires more than once per fight, it is misclassified
 
 ---
 
 ## main chains
 
-main chains define repeatable combat behavior.
+main chains define repeatable combat behavior
 
 guidelines:
 
@@ -136,14 +136,14 @@ guidelines:
 * use conditions instead of waits
 * let priority determine usage frequency
 
-avoid encoding full rotations as a single chain.  
-prefer multiple small chains with clear intent.
+avoid encoding full rotations as a single chain
+prefer multiple small chains with clear intent
 
 ---
 
 ## side chains
 
-side chains run **in parallel** with normal chains.
+side chains run **in parallel** with normal chains
 
 hard rules:
 
@@ -152,9 +152,9 @@ hard rules:
 * **side chains can only contain instant cast actions**
 * **non-instant skills cannot be placed in side chains**
 
-side chains are evaluated continuously and may fire while another chain is already executing, as long as their conditions are met.
+side chains are evaluated continuously and may fire while another chain is already executing, as long as their conditions are met
 
-if a skill has a cast time, channel, or animation lock, it does not belong in a side chain.
+if a skill has a cast time, channel, or animation lock, it does not belong in a side chain
 
 ---
 
@@ -167,28 +167,28 @@ side chains are used exclusively for:
 * reactive effects that must not delay the rotation
 * opportunistic skills that should fire whenever possible
 
-side chains exist to add behavior without affecting sequencing.
+side chains exist to add behavior without affecting sequencing
 
 ---
 
 ### side chains vs filler chains
 
-side chains and filler chains serve different purposes.
+side chains and filler chains serve different purposes
 
 * filler chains run when nothing else is available
 * side chains run regardless of what else is happening
 
-filler chains still respect sequential execution.  
-side chains bypass it entirely.
+filler chains still respect sequential execution
+side chains bypass it entirely
 
-use filler chains for low-priority rotation skills.  
-use side chains only for instant, non-blocking actions.
+use filler chains for low-priority rotation skills
+use side chains only for instant, non-blocking actions
 
 ---
 
 ## filler chains
 
-filler chains run when no higher-priority main chain is valid.
+filler chains run when no higher-priority main chain is valid
 
 typical uses:
 
@@ -201,25 +201,25 @@ best practice:
 * few or no conditions
 * lowest priority
 
-filler chains absorb timing variance and prevent idle time.
+filler chains absorb timing variance and prevent idle time
 
 ---
 
 ## stunbreak chains
 
-stunbreak chains are evaluated separately from other chains.
+stunbreak chains are evaluated separately from other chains
 
 * they trigger only under control-impairing conditions
 * they should contain only stunbreak or survival actions
 * they should be kept minimal and defensive
 
-do not place general utility or damage skills in stunbreak chains.
+do not place general utility or damage skills in stunbreak chains
 
 ---
 
 ## conditions
 
-conditions control when a chain or action may execute.
+conditions control when a chain or action may execute
 
 common examples:
 
@@ -228,20 +228,20 @@ common examples:
 * resource thresholds
 * combat state
 
-conditions can be inverted to express exclusions.
+conditions can be inverted to express exclusions
 
 ### inverting conditions
 
-green condition names can be inverted.
+green condition names can be inverted
 
-inversion is often cleaner than duplicating logic.  
-prefer one inverted condition over two nearly identical chains.
+inversion is often cleaner than duplicating logic
+prefer one inverted condition over two nearly identical chains
 
 ---
 
 ## continue triggers and timing
 
-continue triggers determine when the next action may begin.
+continue triggers determine when the next action may begin
 
 guidelines:
 
@@ -249,8 +249,8 @@ guidelines:
 * later triggers allow tighter chaining
 * channeling or looping skills require care
 
-use triggers to enforce animation safety instead of fixed delays.  
-fixed waits tend to break under alacrity or latency.
+use triggers to enforce animation safety instead of fixed delays
+fixed waits tend to break under alacrity or latency
 
 ---
 
@@ -263,8 +263,8 @@ each action can define its own targeting behavior:
 * ground-targeted logic
 * profession-specific behavior
 
-do not assume default targeting is correct for all skills.  
-mis-targeted skills are a common silent failure.
+do not assume default targeting is correct for all skills
+mis-targeted skills are a common silent failure
 
 ---
 
@@ -274,7 +274,7 @@ mis-targeted skills are a common silent failure.
 * instant skills belong in side chains or low-priority filler
 * avoid blocking long chains with instants unless intended
 
-instants should be opportunistic, not rotational anchors.
+instants should be opportunistic, not rotational anchors
 
 ---
 
@@ -286,7 +286,7 @@ use the **visual debugger** to:
 * identify failed conditions
 * verify priority order
 
-if something does not fire, check priority before adding more conditions.
+if something does not fire, check priority before adding more conditions
 
 ---
 
@@ -297,14 +297,13 @@ if something does not fire, check priority before adding more conditions.
 * relying on fixed wait timers
 * incorrect priority ordering
 * skill-bar mismatches
-* placing non-instant skills in side chains
 
-most issues come from over-specifying behavior instead of letting priority work.
+most issues come from over-specifying behavior instead of letting priority work
 
 ---
 
 ## design principle
 
-an acr should always select the highest-value action that is safe to execute.
+an acr should always select the highest-value action that is safe to execute
 
-use priority and conditions to encode intent, not button order.
+use priority and conditions to encode intent, not button order
