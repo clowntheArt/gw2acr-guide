@@ -1,218 +1,310 @@
-# gw2acr — How to Build an ACR
+# gw2acr - how to build an acr
 
-A practical, decision-focused guide to designing **Automated Combat Routines (ACRs)** in gw2acr. This page explains *how to think* about rotations, not just where to click.
-
----
-
-## What an ACR Is (and Is Not)
-
-An **ACR** defines *what your character should do* and *under which conditions* for **one exact skill bar**.
-
-* It is evaluated continuously during combat
-* It executes the **highest‑priority valid chain** at any moment
-* It adapts dynamically to cooldowns, buffs, and state
-
-**An ACR is not a script.** It does not replay a fixed sequence. It encodes decision logic.
+this guide is my accumulation of info from ctrl + f'ing the discord and my understanding of what an acr is
 
 ---
 
-## Core Building Blocks
+## what an acr is (and is not)
 
-### Actions
+an **acr** defines what actions are executed and under which conditions for **one exact skill bar**.
 
-A single executable step:
+* evaluated continuously during combat
+* executes the **highest-priority valid chain**
+* reacts to cooldowns, buffs and character state
 
-* Casting a skill
-* Weapon swap
-* Profession mechanic
-
-Actions may define targeting, parameters, and continuation behavior.
+an acr is **not a script**. it does not replay a fixed sequence.
 
 ---
 
-### Chains
+## core building blocks
 
-A **chain** is an ordered list of actions.
+### actions
 
-Rules:
+a single executable step, such as:
 
-* Actions execute top → bottom
-* A chain can only start if all its **conditions** are true
-* Once started, the chain runs to completion
+* casting a skill
+* weapon swapping
+* activating a profession mechanic
 
-Chains are the atomic units of rotation logic.
-
----
-
-### Priority
-
-Chains are evaluated **from top to bottom**.
-
-* The first valid chain is executed
-* Priority replaces rigid sequencing
-
-> **Key idea:** Priority expresses *value*, not order.
+actions may define targeting, parameters and continuation behavior.
 
 ---
 
-## Creating a New ACR
+### chains
 
-### 1. Prepare the Character State
+a **chain** is an ordered list of actions.
 
-Before creating an ACR, your character must match the intended setup exactly:
+rules:
 
-* Weapons
-* Traits and specializations
-* Utility skills
-* Transform state (shroud, kits, etc.)
+* actions execute top to bottom
+* a chain can only start if all its conditions are met
+* once started, the chain runs to completion
 
-Any mismatch will prevent the ACR from activating.
+chains are the basic units of rotation logic.
 
----
-
-### 2. Capture the Skill Bar
-
-* Open the **ACR Editor**
-* Select **New ACR from current skill bar**
-* Name the ACR clearly (e.g. `Reaper_GS`, `Tempest_Fire`)
-
-Save immediately.
+keep chains short and purpose-driven. long chains are harder to reason about and easier to break.
 
 ---
 
-## Structuring a Good ACR
+### priority
 
-Well‑designed ACRs are layered, not linear.
+chains are evaluated from top to bottom.
 
-### Common Structure
+* the first valid chain is executed
+* priority determines execution order
 
-1. **Opener chains** – one‑time setup
-2. **Burst / cooldown chains** – high‑value skills
-3. **Main loop chains** – repeatable core logic
-4. **Filler chains** – low‑priority actions
-5. **Safety / constraint chains** – prevent mistakes
+priority represents value, not sequence.  
+if two chains can run, the higher one always wins.
 
-Not all ACRs need every layer, but this structure scales cleanly.
+most rotation problems are priority problems, not condition problems.
 
 ---
 
-## Opener Chains
+## chain types
 
-* Execute once per combat
-* Lock out after the main rotation begins
-* Used for setup, long cooldowns, or state entry
+gw2acr supports four distinct chain types. they differ in when and how they are evaluated.
 
-Openers should be short and intentional.
+* **opener chains**
+* **main chains**
+* **side chains**
+* **stunbreak chains**
 
----
-
-## Main Rotation Chains
-
-Main chains represent the **repeatable decision logic** of the build.
-
-Design rules:
-
-* Keep chains short
-* Gate actions with conditions, not waits
-* Let priority determine frequency
-
-Avoid encoding entire rotations as a single chain.
+understanding the differences is critical to building correct logic.
 
 ---
 
-## Filler Chains
+## creating a new acr
 
-Filler chains execute when nothing more valuable is available.
+### 1. prepare the character state
 
-Typical uses:
+before creating an acr, the character must exactly match the intended setup:
 
-* Auto‑attacks
-* Low‑impact skills
-* Instant casts
+* weapons
+* traits and specializations
+* utility skills
+* transform state (shroud, kits, etc.)
 
-Best practice:
-
-* Minimal or no conditions
-* Lowest priority
-
----
-
-## Conditions (Where Logic Lives)
-
-Conditions define *when* a chain or action is allowed to execute.
-
-Common examples:
-
-* Skill cooldown ready
-* Buff present or missing
-* Resource thresholds
-* Combat state
-
-Conditions can be inverted to express exclusions cleanly.
+any mismatch prevents the acr from activating.  
+if an acr does not load, recreate it from the live character state.
 
 ---
 
-## Continue Triggers & Timing
+### 2. capture the skill bar
 
-Continue triggers control **when the next action may begin**.
+* open the **acr editor**
+* select **new acr from current skill bar**
+* name the acr clearly (e.g. `reaper_gs`, `tempest_fire`)
 
-Guidelines:
-
-* Trigger `0` is always safe
-* Later triggers allow tighter chaining
-* Channeling or looping skills require care
-
-Use triggers to enforce animation safety instead of fixed waits.
+save immediately.
 
 ---
 
-## Targeting Logic
+## structuring an acr
 
-Each action can define its own targeting mode:
+acrs should be layered rather than linear.
 
-* Current target
-* Self
-* Ground‑targeted logic
-* Profession‑specific behavior
+### common structure
 
-Never assume default targeting is correct for all skills.
+1. **opener chains** one-time setup
+2. **main chains** core repeatable logic
+3. **side chains** instant parallel actions
+4. **filler chains** low-priority sequential actions
+5. **stunbreak chains** control recovery
 
----
-
-## Interrupts & Instants
-
-* Interrupts are handled automatically
-* Instant skills can be placed in filler or side chains
-* Avoid blocking long chains with instants unless intentional
+not every acr requires all layers, but this structure scales well.
 
 ---
 
-## Testing & Debugging
+## opener chains
 
-Use the **visual debugger** to:
+* execute once per combat
+* disabled after the main rotation begins
+* used for setup, long cooldowns or state entry
 
-* See which chains are evaluated
-* Understand why conditions fail
-* Verify priority ordering
-
-Test incrementally and adjust one variable at a time.
-
----
-
-## Common Mistakes
-
-* Treating ACRs like scripts
-* Overusing long fixed chains
-* Relying on fixed wait timers
-* Misordered priorities
-* Forgetting exact skill‑bar matching
+openers should be short and intentional.  
+if an opener fires more than once per fight, it is misclassified.
 
 ---
 
-## Design Philosophy
+## main chains
 
-A strong ACR answers one question repeatedly:
+main chains define repeatable combat behavior.
 
-> *What is the most valuable **safe** action I can perform right now?*
+guidelines:
 
-Encode intent, not button order. Let priority and conditions do the work.
+* keep chains short
+* use conditions instead of waits
+* let priority determine usage frequency
+
+avoid encoding full rotations as a single chain.  
+prefer multiple small chains with clear intent.
+
+---
+
+## side chains
+
+side chains run **in parallel** with normal chains.
+
+hard rules:
+
+* normal chains run in sequence
+* side chains do not block or interrupt normal chains
+* **side chains can only contain instant cast actions**
+* **non-instant skills cannot be placed in side chains**
+
+side chains are evaluated continuously and may fire while another chain is already executing, as long as their conditions are met.
+
+if a skill has a cast time, channel, or animation lock, it does not belong in a side chain.
+
+---
+
+### what side chains are for
+
+side chains are used exclusively for:
+
+* instant cast utility skills
+* buffs that should be used on cooldown
+* reactive effects that must not delay the rotation
+* opportunistic skills that should fire whenever possible
+
+side chains exist to add behavior without affecting sequencing.
+
+---
+
+### side chains vs filler chains
+
+side chains and filler chains serve different purposes.
+
+* filler chains run when nothing else is available
+* side chains run regardless of what else is happening
+
+filler chains still respect sequential execution.  
+side chains bypass it entirely.
+
+use filler chains for low-priority rotation skills.  
+use side chains only for instant, non-blocking actions.
+
+---
+
+## filler chains
+
+filler chains run when no higher-priority main chain is valid.
+
+typical uses:
+
+* auto-attacks
+* low-impact skills
+* low-priority rotation abilities
+
+best practice:
+
+* few or no conditions
+* lowest priority
+
+filler chains absorb timing variance and prevent idle time.
+
+---
+
+## stunbreak chains
+
+stunbreak chains are evaluated separately from other chains.
+
+* they trigger only under control-impairing conditions
+* they should contain only stunbreak or survival actions
+* they should be kept minimal and defensive
+
+do not place general utility or damage skills in stunbreak chains.
+
+---
+
+## conditions
+
+conditions control when a chain or action may execute.
+
+common examples:
+
+* skill cooldown availability
+* buff or debuff presence
+* resource thresholds
+* combat state
+
+conditions can be inverted to express exclusions.
+
+### inverting conditions
+
+green condition names can be inverted.
+
+inversion is often cleaner than duplicating logic.  
+prefer one inverted condition over two nearly identical chains.
+
+---
+
+## continue triggers and timing
+
+continue triggers determine when the next action may begin.
+
+guidelines:
+
+* trigger `0` is always safe
+* later triggers allow tighter chaining
+* channeling or looping skills require care
+
+use triggers to enforce animation safety instead of fixed delays.  
+fixed waits tend to break under alacrity or latency.
+
+---
+
+## targeting logic
+
+each action can define its own targeting behavior:
+
+* current target
+* self
+* ground-targeted logic
+* profession-specific behavior
+
+do not assume default targeting is correct for all skills.  
+mis-targeted skills are a common silent failure.
+
+---
+
+## interrupts and instants
+
+* interrupts are handled automatically
+* instant skills belong in side chains or low-priority filler
+* avoid blocking long chains with instants unless intended
+
+instants should be opportunistic, not rotational anchors.
+
+---
+
+## testing and debugging
+
+use the **visual debugger** to:
+
+* observe chain evaluation
+* identify failed conditions
+* verify priority order
+
+if something does not fire, check priority before adding more conditions.
+
+---
+
+## common mistakes
+
+* treating acrs as scripts
+* using overly long chains
+* relying on fixed wait timers
+* incorrect priority ordering
+* skill-bar mismatches
+* placing non-instant skills in side chains
+
+most issues come from over-specifying behavior instead of letting priority work.
+
+---
+
+## design principle
+
+an acr should always select the highest-value action that is safe to execute.
+
+use priority and conditions to encode intent, not button order.
